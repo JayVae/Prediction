@@ -3,9 +3,10 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
+# from tensorflow import keras
 from keras.models import Sequential
 from keras.layers import LSTM, Dense, Activation
-
+import tensorflow as tf
 
 def load_data(file_name, sequence_length=3, split=0.8):
     df = pd.read_csv(file_name, sep=',', usecols=[1])
@@ -17,17 +18,16 @@ def load_data(file_name, sequence_length=3, split=0.8):
         data.append(data_all[i: i + sequence_length + 1])
     reshaped_data = np.array(data).astype('float64')
     # np.random.shuffle(reshaped_data)#
-    # 对x进行统一归一化，而y则不归一化
     x = reshaped_data[:, :-1]
     y = reshaped_data[:, -1]
     split_boundary = int(reshaped_data.shape[0] * split)
     train_x = x[: split_boundary]
-    # test_x = x[split_boundary:]
-    test_x=x[:]
+    test_x = x[split_boundary:]
+    # test_x=x[:]
 
     train_y = y[: split_boundary]
-    # test_y = y[split_boundary:]
-    test_y=y[:]
+    test_y = y[split_boundary:]
+    # test_y=y[:]
     return train_x, train_y, test_x, test_y, scaler,split_boundary
 
 
@@ -68,6 +68,7 @@ def train_model(train_x, train_y, test_x, test_y):
 
 if __name__ == '__main__':
     train_x, train_y, test_x, test_y, scaler, split_boundary = load_data('airline.csv')
+    # shape=(samples, time_steps, input_dim)
     train_x = np.reshape(train_x, (train_x.shape[0], train_x.shape[1], 1))
     test_x = np.reshape(test_x, (test_x.shape[0], test_x.shape[1], 1))
     predict_y, test_y = train_model(train_x, train_y, test_x, test_y)
